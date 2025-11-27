@@ -75,7 +75,7 @@ body {
     color: #333;
     display: flex;
     justify-content: center;
-    align-items: flex-start; 
+    align-items: center;
     min-height: 100vh;
 }
 
@@ -271,8 +271,8 @@ hr {
 /* PC 화면 반응형 조정 (최소 너비 600px 이상) */
 @media (min-width: 600px) {
     .weather-app {
-        margin-top: 10vh; 
-        max-width: 600px; /* PC에서는 앱 컨테이너 너비를 넓힘 */
+        margin-top: 0; 
+        max-width: 600px;
         padding: 30px;
     }
 
