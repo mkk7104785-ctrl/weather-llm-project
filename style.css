@@ -21,12 +21,12 @@ body.night-mode {
 /* 2. 도시 현재 시간 스타일 */
 .date-time {
     font-size: 0.9em;
-    color: #777; /* 도시 이름과 대비되도록 */
+    color: #636363; /* 도시 이름과 대비되도록 */
     margin-top: -10px;
     margin-bottom: 15px;
 }
 .night-mode .date-time {
-    color: #bbb; /* 밤 모드일 때 밝게 조정 */
+    color: #969696; /* 밤 모드일 때 밝게 조정 */
 }
 
 
@@ -54,12 +54,12 @@ body.night-mode {
 .recommendation-text {
     font-size: 1em;
     font-weight: bold;
-    color: #4CAF50; /* 눈에 잘 띄는 녹색 계열 */
+    color: #333; /* 눈에 잘 띄는 녹색 계열 */
     margin-top: 20px;
     padding: 10px;
-    border: 1px dashed #4CAF50;
+    border: 1px dashed #333;
     border-radius: 5px;
-    background-color: rgba(76, 175, 80, 0.05); /* 연한 배경 */
+    background-color: rgba(33, 33, 33, 0.05); /* 연한 배경 */
 }
 
 /* ---------------------------------- */
@@ -141,7 +141,7 @@ body {
 }
 
 h1 {
-    color: #1a73e8;
+    color: #072d5f;
     margin-bottom: 20px;
     font-size: 1.5em;
 }
