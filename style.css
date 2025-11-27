@@ -1,4 +1,68 @@
 /* ---------------------------------- */
+/* 6. 아이콘, 시간, 주/야간 모드 스타일 */
+/* ---------------------------------- */
+
+/* 1. Body 주/야간 모드 배경 (허전함 해결 대안) */
+body.day-mode {
+    background-color: #C9D6DF; /* 옅은 파란색 */
+    transition: background-color 1s ease-in-out;
+}
+
+body.night-mode {
+    background-color: #1c313a; /* 어두운 남색 계열 */
+    color: #e0e0e0; /* 밤에는 기본 텍스트 색상을 밝게 */
+    transition: background-color 1s ease-in-out;
+}
+/* weather-app 컨테이너의 기본 텍스트 색상도 밤 모드일 때 대비되도록 조정 */
+.night-mode .weather-app {
+    color: #333; /* 앱 내부 텍스트는 여전히 어두워야 함 (배경이 밝을 수 있으므로) */
+}
+
+/* 2. 도시 현재 시간 스타일 */
+.date-time {
+    font-size: 0.9em;
+    color: #777; /* 도시 이름과 대비되도록 */
+    margin-top: -10px;
+    margin-bottom: 15px;
+}
+.night-mode .date-time {
+    color: #bbb; /* 밤 모드일 때 밝게 조정 */
+}
+
+
+/* 3. 날씨 아이콘 스타일 */
+.weather-icon {
+    width: 50px; /* 아이콘 크기 조정 */
+    height: 50px;
+    vertical-align: middle; /* 텍스트와 수직 정렬 */
+    margin-right: 5px;
+    display: inline-block;
+}
+
+.weather-status {
+    /* 아이콘을 포함할 수 있도록 margin-bottom을 조정 */
+    margin-bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.3em;
+}
+
+/* ---------------------------------- */
+/* 7. 기온별 옷차림 추천 스타일 추가 */
+/* ---------------------------------- */
+.recommendation-text {
+    font-size: 1em;
+    font-weight: bold;
+    color: #4CAF50; /* 눈에 잘 띄는 녹색 계열 */
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px dashed #4CAF50;
+    border-radius: 5px;
+    background-color: rgba(76, 175, 80, 0.05); /* 연한 배경 */
+}
+
+/* ---------------------------------- */
 /* 3. CSS: Mobile First & 반응형 디자인 */
 /* ---------------------------------- */
 
@@ -7,11 +71,11 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 20px;
-    background-color: #f4f7f6; /* 깔끔한 배경 */
+    background-color: #f4f7f6;
     color: #333;
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* 상단에서 시작 (PC에서 중앙에 오도록) */
+    align-items: flex-start; 
     min-height: 100vh;
 }
 
@@ -20,10 +84,60 @@ body {
     width: 100%;
     max-width: 350px; /* 모바일 크기 제한 */
     background: #fff;
+    transition: background 0.8s ease-in-out, box-shadow 0.8s ease-in-out;
+    color: #333;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     text-align: center;
+}
+
+/* 맑음: 밝고 따뜻한 하늘색 */
+.weather-app.clear-sky {
+    background: linear-gradient(135deg, #87CEFA 0%, #ADD8E6 100%);
+    color: #333;
+    box-shadow: 0 4px 20px rgba(0, 191, 255, 0.4);
+}
+
+/* 구름/흐림: 부드러운 회색 톤 */
+.weather-app.clouds {
+    background: linear-gradient(135deg, #F5F5F5 0%, #CCCCCC 100%);
+    color: #333;
+    box-shadow: 0 4px 20px rgba(169, 169, 169, 0.4);
+}
+
+/* 비/소나기: 시원하고 어두운 파란색 */
+.weather-app.rain {
+    background: linear-gradient(135deg, #4682B4 0%, #6495ED 100%);
+    color: #333; /* 글씨색을 흰색으로 변경하여 가독성 확보 */
+    box-shadow: 0 4px 20px rgba(70, 130, 180, 0.5);
+}
+
+/* 눈: 밝고 차가운 흰색 */
+.weather-app.snow {
+    background: linear-gradient(135deg, #FFFFFF 0%, #E0FFFF 100%);
+    color: #333;
+    box-shadow: 0 4px 20px rgba(176, 224, 230, 0.4);
+}
+
+/* 안개/연무: 차분한 회색/녹색 */
+.weather-app.mist {
+    background: linear-gradient(135deg, #C0C0C0 0%, #A9A9A9 100%);
+    color: #333;
+    box-shadow: 0 4px 20px rgba(192, 192, 192, 0.5);
+}
+
+/* 천둥/폭풍: 어둡고 극적인 톤 */
+.weather-app.thunderstorm {
+    background: linear-gradient(135deg, #4B0082 0%, #191970 100%);
+    color: white; 
+    box-shadow: 0 4px 20px rgba(75, 0, 130, 0.6);
+}
+
+/* 동적 배경에 맞춰 글씨 색상 조정 (비, 천둥일 때) */
+.weather-app.rain .temperature, 
+.weather-app.thunderstorm .temperature {
+    color: #FFD700; /* 황금색으로 변경하여 대비를 줌 */
 }
 
 h1 {
@@ -36,7 +150,7 @@ h1 {
 .search-box {
     display: flex;
     gap: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 }
 
 #cityInput {
@@ -62,15 +176,31 @@ h1 {
     background-color: #3b78e7;
 }
 
+/* 단위 전환 버튼 스타일 */
+.unit-toggle {
+    margin: 10px 0 20px 0;
+    text-align: right;
+}
+
+#unitToggle {
+    background-color: #f0f0f0;
+    color: #444;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
 /* 날씨 정보 표시 스타일 */
 .weather-info {
     margin-top: 20px;
     padding: 15px;
-    border-top: 1px solid #eee;
 }
 
 .city-name {
-    font-size: 1.5em;
+    font-size: 2em;
     font-weight: bold;
     color: #333;
 }
@@ -94,17 +224,65 @@ h1 {
     margin-top: 15px;
 }
 
+hr {
+    border: 0;
+    border-top: 1px dashed #ccc;
+    margin: 20px 0;
+}
+
+/* 3일 단기 예보 스타일 (Mobile First: 세로 배열) */
+.forecast-container {
+    display: flex;
+    flex-direction: column; 
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.forecast-card {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    flex: 1;
+}
+
+.forecast-card .day {
+    font-weight: bold;
+    color: #1a73e8;
+    margin-bottom: 5px;
+}
+
+.forecast-card .temp-max {
+    color: #db4437; 
+    font-size: 1.1em;
+    font-weight: bold;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.forecast-card .temp-min {
+    color: #4285f4; 
+    font-size: 0.9em;
+    display: inline-block;
+}
+
 
 /* PC 화면 반응형 조정 (최소 너비 600px 이상) */
 @media (min-width: 600px) {
-    /* PC에서는 앱 컨테이너를 중앙에 배치하고 크기를 약간 키웁니다. */
     .weather-app {
-        margin-top: 10vh; /* 화면 상단에서 여백을 줘서 보기 좋게 중앙 배치 */
-        max-width: 450px;
+        margin-top: 10vh; 
+        max-width: 600px; /* PC에서는 앱 컨테이너 너비를 넓힘 */
         padding: 30px;
     }
 
     h1 {
         font-size: 2em;
+    }
+
+    /* PC: 예보 카드를 가로로 배열 */
+    .forecast-container {
+        flex-direction: row; 
+        justify-content: space-between;
     }
 }

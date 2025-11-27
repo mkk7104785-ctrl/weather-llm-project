@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>바닐라 JS 날씨 앱</title>
+    <title>바닐라 JS 날씨 앱 (확장)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -11,16 +11,29 @@
         <h1>날씨 정보 검색</h1>
         
         <div class="search-box">
-            <input type="text" id="cityInput" placeholder="도시 이름을 입력하세요 (예: Seoul)">
+            <input type="text" id="cityInput" placeholder="도시 이름을 입력하세요 (예: Seoul 혹은 서울)">
             <button id="searchBtn">검색</button>
+        </div>
+
+        <div class="unit-toggle">
+            <button id="unitToggle" data-unit="C">°C / °F</button>
         </div>
 
         <div class="weather-info">
             <p id="cityDisplay" class="city-name"></p>
             <p id="temp" class="temperature"></p>
             <p id="description" class="weather-status"></p>
+
+            <p id="clothingRecommendation" class="recommendation-text"></p>
+
             <p id="errorMessage" class="error-message"></p>
         </div>
+        
+        <hr>
+
+        <h2>3일 단기 예보</h2>
+        <div class="forecast-container" id="forecastContainer">
+            </div>
     </div>
 
     <script src="script.js"></script>
