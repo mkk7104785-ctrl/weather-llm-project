@@ -20,11 +20,12 @@ body.night-mode {
 
 /* 2. 도시 현재 시간 스타일 */
 .date-time {
-    font-size: 0.9em;
-    color: #636363; /* 도시 이름과 대비되도록 */
-    margin-top: -10px;
+    font-size: 0.5em;
+    color: #636363; 
+    margin-top: 10px;
     margin-bottom: 15px;
 }
+
 .night-mode .date-time {
     color: #969696; /* 밤 모드일 때 밝게 조정 */
 }
@@ -108,10 +109,11 @@ body {
     background: #fff;
     transition: background 0.8s ease-in-out, box-shadow 0.8s ease-in-out;
     color: #333;
-    padding: 20px;
+    padding: 10px 20px;
     border-radius: 10px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     text-align: center;
+    margin-top: -30px;
 }
 
 /* 맑음: 밝고 따뜻한 하늘색 */
@@ -198,10 +200,74 @@ h1 {
     background-color: #3b78e7;
 }
 
-/* 단위 전환 버튼 스타일 */
+/* 4: 빠른 검색 및 단위 토글 컨테이너 스타일 추가*/
+.quick-search-and-toggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 0;
+}
+
+/* style.css (.quick-search-buttons 컨테이너 스타일) */
+.quick-search-buttons {
+    display: flex;
+    /* ★★★ FIX: 중앙 정렬(center) 대신 좌측 정렬(flex-start)로 변경 ★★★ */
+    justify-content: flex-start; 
+    
+    /* 버튼 그룹 간 간격을 20px로 재설정 */
+    gap: 20px; 
+    
+    overflow-x: auto; 
+    padding-bottom: 5px; 
+    max-width: 70%;
+    
+    /* ★★★ FIX: 맨 앞에 15px 여백을 명확하게 부여 ★★★ */
+    padding-left: 15px; 
+}
+
+/* style.css (.quick-city-btn 스타일) */
+.quick-city-btn {
+    background-color: transparent;
+    border: none;
+    
+    /* 텍스트 자체의 패딩은 제거 */
+    padding: 0; 
+    
+    /* 텍스트 스타일 */
+    color: #333; 
+    cursor: pointer; 
+    font-size: 0.9em;
+    font-weight: 500;
+    white-space: nowrap; 
+    transition: color 0.2s;
+    
+    /* ★★★ FIX: 불필요한 마진/텍스트 정렬 제거 ★★★ */
+    margin: 0; 
+    text-align: left; /* 텍스트는 좌측 정렬이 기본 */
+    
+    /* 구분선(`|`)과 다음 버튼 사이의 간격 */
+    border-right: 1px solid #a0a0a0;
+    padding-right: 20px; /* 구분선과 다음 버튼 텍스트 사이 간격 */
+}
+
+.quick-city-btn:hover {
+    background-color: transparent; /* 호버 시 배경색 변경 방지 */
+    color: #141414; /* 호버 시 색상을 조금 더 진하게 변경하여 클릭 가능하다는 피드백 제공 */
+    text-decoration: underline; /* 밑줄 추가 */
+}
+
+/* 맨 마지막 버튼의 구분선 제거 */
+.quick-search-buttons button:last-child {
+    border-right: none;
+    padding-right: 0;
+    margin: 0;
+}
+
+/* 단위 전환 버튼 스타일 (위치 조정) */
 .unit-toggle {
-    margin: 10px 0 20px 0;
+    margin: 0;
     text-align: right;
+    flex-shrink: 0;
 }
 
 #unitToggle {
@@ -217,18 +283,20 @@ h1 {
 
 /* 날씨 정보 표시 스타일 */
 .weather-info {
-    margin-top: 20px;
-    padding: 15px;
+    margin-top: 0;
+    padding: 5px 15px 15px 15px;
     text-align: center;
 }
 
 /* 날씨 상태와 미세먼지 정보를 담을 컨테이너 스타일 추가 */
+/* 글씨 크기 통일을 위한 수정 */
+/* weather-status-line의 폰트 사이즈를 모든 인라인 텍스트의 기본 사이즈로 사용 */
 .weather-status-line {
     display: flex;
-    justify-content: center; /* 중앙 정렬 */
+    justify-content: center;
     align-items: center;
-    font-size: 1.2em;
-    color: #666;
+    font-size: 1.2em; /* 기본 폰트 크기 */
+    color: #666; /* 기본 텍스트 색상 */
     margin-bottom: 0;
     flex-wrap: wrap; 
 }
@@ -253,11 +321,9 @@ h1 {
 
 /* 인라인 미세먼지 텍스트 스타일 */
 .air-quality-inline {
-    font-size: 0.8em; /* 날씨 텍스트보다 작게 */
-    color: #888; 
+    color: #666; /* 날씨 텍스트와 같은 색상으로 통일 */
     margin-left: 15px;
     padding-left: 15px;
-    /* 인라인 요소 내부의 미세먼지 상태 텍스트 색상 */
 }
 
 .aqi-separator {
@@ -266,9 +332,23 @@ h1 {
     margin: 0 5px;
 }
 
+/* 새로운 클래스: AQI 항목 전체 스타일 및 커서 변경 */
+.air-quality-inline .aqi-item {
+    padding: 0 5px; /* 클릭 영역을 시각적으로 살짝 넓혀줍니다. */
+    cursor: pointer; /* 마우스를 올렸을 때 클릭 가능한 손가락 모양으로 변경 */
+    transition: color 0.1s;
+}
+
+/* 마우스 오버 시 미세먼지 텍스트 색상을 약간 밝게 변경하여 피드백 제공 (선택 사항) */
+.air-quality-inline .aqi-item:hover {
+    color: #4285f4; /* 호버 시 파란색으로 변경 */
+}
+
+
+/* 기존 미세먼지 상태 텍스트 (aqi-status)는 그대로 유지 */
 .air-quality-inline .aqi-status {
     font-weight: bold;
-    color: #3b78e7; /* 상태 강조 색상 */
+    color: #3b78e7; /* 상태 강조 색상 (유지) */
     margin-right: 5px;
 }
 
@@ -322,13 +402,72 @@ hr {
     display: inline-block;
 }
 
+/* ---------------------------------- */
+/* 9. AQI 모달(팝업) 스타일 추가 */
+/* ---------------------------------- */
+.aqi-modal {
+    position: fixed;
+    z-index: 1000; /* 앱 위에 떠 있도록 높게 설정 */
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4); /* 배경을 어둡게 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    padding: 20px;
+    border: 1px solid #888;
+    border-radius: 10px;
+    width: 80%;
+    max-width: 300px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#modalTitle {
+    color: #4285f4;
+    margin-top: 0;
+}
+
+#modalValue {
+    font-size: 2em;
+    font-weight: bold;
+    color: #333;
+    margin: 10px 0;
+}
+
+.modal-unit {
+    font-size: 0.8em;
+    color: #888;
+}
 
 /* PC 화면 반응형 조정 (최소 너비 600px 이상) */
 @media (min-width: 600px) {
     .weather-app {
-        margin-top: 0; 
+        /*margin-top: 0;*/  
         max-width: 600px;
         padding: 30px;
+        margin-top: -50px;
     }
 
     h1 {

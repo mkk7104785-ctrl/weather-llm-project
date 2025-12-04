@@ -17,15 +17,22 @@ const unitToggle = document.getElementById('unitToggle');
 const forecastContainer = document.getElementById('forecastContainer');
 const weatherApp = document.querySelector('.weather-app');
 const clothingRecommendationDisplay = document.getElementById('clothingRecommendation');
-const bodyElement = document.body; // body 요소
+const bodyElement = document.body;
+const quickCityButtons = document.querySelectorAll('.quick-city-btn');
 
 
-// ★★★ 사용자님의 실제 API 키를 반영했습니다! ★★★
+// 실제 API 키를 반영
 const API_KEY = "6d8fe32823d8390520bec80b1d47f957"; 
 const DUMMY_WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather";
 const DUMMY_FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast"; 
 const DUMMY_GEOCODING_URL = "https://api.openweathermap.org/geo/1.0/direct";
 const DUMMY_AIR_POLLUTION_URL = "https://api.openweathermap.org/data/2.5/air_pollution"; 
+
+// 모달 요소 추가
+const aqiModal = document.getElementById('aqiModal');
+const modalTitle = document.getElementById('modalTitle');
+const modalValue = document.getElementById('modalValue');
+const modalCloseBtn = aqiModal ? aqiModal.querySelector('.close-btn') : null;
 
 
 // ----------------------------------
@@ -54,15 +61,23 @@ function getWeatherClass(description) {
 
 /**
  * 도시의 시간대(timezone offset)를 사용하여 현재 시각을 계산하고 포맷합니다.
- */
+*/
 function getFormattedTime(timezoneOffset) {
-    const localTime = new Date(Date.now() + timezoneOffset * 1000);
+    const now = new Date();
+    const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const localTime = new Date(utcTime + (timezoneOffset * 1000));
+
     const options = {
-        month: 'long', day: 'numeric',
-        hour: '2-digit', minute: '2-digit', 
-        hour12: true, timeZone: 'UTC'
+        month: 'long', 
+        day: 'numeric', 
+        weekday: 'long', // ★★★ 요일 추가 ★★★
+        hour: 'numeric', 
+        minute: 'numeric', 
+        hour12: true 
     };
-    return localTime.toLocaleTimeString('ko-KR', options);
+    
+    // 한국어 로케일을 사용하여 포맷
+    return localTime.toLocaleDateString('ko-KR', options);
 }
 
 /**
@@ -94,10 +109,9 @@ function getClothingRecommendation(tempC) {
         return "9°C ~ 11°C: 자켓, 트렌치코트, 야상, 니트, 청바지, 스타킹";
     } else if (tempC >= 5) { // 8°C ~ 5°C
         return "5°C ~ 8°C: 코트, 가죽자켓, 히트텍, 니트, 레깅스";
-    } else if (tempC < 5) { // ★★★ 4°C 이하 조건을 명시적으로 처리 ★★★
+    } else if (tempC < 5) { // 4°C 이하 조건을 명시적으로 처리
         return "4°C 이하: 패딩, 두꺼운 코트, 목도리, 기모제품 (따뜻하게 입으세요!)";
     }
-    // 모든 조건에 해당하지 않을 경우 (null/undefined/이상한 값)
     return "온도 정보를 가져올 수 없습니다.";
 }
 // ----------------------------------------
@@ -106,7 +120,6 @@ function getClothingRecommendation(tempC) {
  * OpenWeatherMap의 AQI 지수(1-5)를 한글 상태로 변환
  */
 function getAqiStatus(aqi) {
-    // OpenWeatherMap 기준 (1:좋음, 2:보통, 3:나쁨, 4:매우 나쁨, 5:위험)
     switch(aqi) {
         case 1: return "매우 좋음";
         case 2: return "좋음";
@@ -118,28 +131,48 @@ function getAqiStatus(aqi) {
 }
 
 /**
+ * 현재 시간을 '날짜 요일 시간' 형식으로 포맷하는 함수 (요일 추가)
+ * @param {number} timezoneOffset - UTC로부터의 시간대 오프셋 (초)
+ */
+function getFormattedTime(timezoneOffset) {
+    const now = new Date();
+    // UTC 시간을 구한 후, timezoneOffset을 더해 목표 도시의 로컬 시간을 구합니다.
+    const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+    const localTime = new Date(utcTime + (timezoneOffset * 1000));
+
+    const options = {
+        month: 'long', 
+        day: 'numeric', 
+        weekday: 'long', // 요일
+        hour: 'numeric', 
+        minute: 'numeric', 
+        hour12: true // 오전/오후
+    };
+    
+    // toLocaleString을 사용하여 날짜, 요일, 시간을 모두 출력
+    return localTime.toLocaleString('ko-KR', options); 
+}
+
+/**
  * 오류 발생 시 콘솔에 출력하고 사용자에게 표시하는 함수
  */
 function handleError(error) {
     console.error("날씨 정보를 가져오는 중 오류 발생:", error);
     errorDisplay.textContent = `오류: ${error.message}`;
+    
+    // 표시된 모든 정보 초기화
     cityDisplay.textContent = '';
     tempDisplay.textContent = '';
     descriptionDisplay.textContent = '';
     forecastContainer.innerHTML = '';
     clothingRecommendationDisplay.textContent = '';
     
-    // 오류 시 미세먼지 정보 초기화 
-    if (pm10StatusDisplay) pm10StatusDisplay.textContent = '';
-    if (pm25StatusDisplay) pm25StatusDisplay.textContent = '';
-    if (airQualityBox) airQualityBox.style.display = 'none';
+    // cityDisplay 내부에 동적으로 삽입된 날짜/시간 요소 제거
+    // 해당 로직은 cityDisplay.innerHTML = '' 으로 이미 처리됩니다.
     
     currentWeatherData = null;
     weatherApp.className = 'weather-app'; 
     bodyElement.className = ''; 
-    
-    const dateTimeElement = document.getElementById('currentDateTime');
-    if (dateTimeElement) dateTimeElement.remove();
 }
 
 // ----------------------------------
@@ -244,14 +277,13 @@ function displayForecast(dates, dailyForecasts) {
 }
 
 // ----------------------------------
-// 미세먼지 정보 가져오기 (문자열 반환)
+// 미세먼지 정보 가져오기 (수치 툴팁 추가)
 // ----------------------------------
 
 /**
- * 좌표를 기반으로 대기 오염 정보를 가져와 간결한 문자열 상태를 반환합니다.
- * @returns {string} 예: "미세먼지: 좋음 | 초미세먼지: 좋음"
+ * 미세먼지 수치를 가져와 툴팁(title)에 포함하여 문자열 반환
  */
-    async function getAirQualityByCoords(lat, lon) {
+async function getAirQualityByCoords(lat, lon) {
     const url = `${DUMMY_AIR_POLLUTION_URL}?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
     
     try {
@@ -261,17 +293,65 @@ function displayForecast(dates, dailyForecasts) {
         }
         
         const data = await response.json();
-        const general_aqi = data.list[0].main.aqi; // 전반적인 AQI 지수 (1~5)
+        const components = data.list[0].components;
+        const general_aqi = data.list[0].main.aqi; 
         const status = getAqiStatus(general_aqi);
+        
+        // PM10/PM2.5 수치 가져오기 (반올림, μg/m³)
+        const pm10Value = Math.round(components.pm10 || 0); 
+        const pm25Value = Math.round(components.pm2_5 || 0);
+        
+        const pm10Title = `미세먼지 수치: ${pm10Value} µg/m³`;
+        const pm25Title = `초미세먼지 수치: ${pm25Value} µg/m³`;
 
-        // PM10과 PM2.5 상태만 간결하게 표시
-        return `<span class="aqi-separator">|</span> 미세먼지: <span class="aqi-status pm10">${status}</span> | 초미세먼지: <span class="aqi-status pm25">${status}</span>`;
+        const pm10Event = `showAqiModal('미세먼지 (PM10)', ${pm10Value})`;
+        const pm25Event = `showAqiModal('초미세먼지 (PM2.5)', ${pm25Value})`;  
+
+        // title 속성 대신 onClick 이벤트 삽입
+        return `
+            <span class="aqi-separator">|</span> 
+            <span class="aqi-item" onclick="${pm10Event}">
+                미세먼지: <span class="aqi-status pm10" title="${pm10Title}">${status}</span>
+            </span>
+            <span class="aqi-separator">|</span> 
+            <span class="aqi-item" onclick="${pm25Event}">
+                초미세먼지: <span class="aqi-status pm25" title="${pm25Title}">${status}</span>
+            </span>
+        `;
+        // NOTE: aqi-item 클래스가 PM10 전체 항목을 감쌉니다.
 
     } catch (error) {
         console.warn("대기 오염 정보를 가져오는 중 오류 발생:", error.message);
-        return ``; // 오류 시 빈 문자열 반환
+        return ``;
     }
 }
+
+// ----------------------------------
+// 모달 표시 로직 추가
+// ----------------------------------
+
+// 전역 함수로 선언하여 HTML의 onclick 속성에서 접근 가능하도록 합니다.
+window.showAqiModal = (title, value) => {
+    if (!aqiModal) return; 
+
+    modalTitle.textContent = title;
+    modalValue.textContent = value;
+    aqiModal.style.display = 'flex';
+};
+
+// 모달 닫기 이벤트 리스너
+if (modalCloseBtn) {
+    modalCloseBtn.onclick = () => {
+        aqiModal.style.display = 'none';
+    };
+}
+
+// 모달 바깥쪽 클릭 시 닫기
+window.onclick = (event) => {
+    if (event.target === aqiModal) {
+        aqiModal.style.display = 'none';
+    }
+};
 
 // ----------------------------------
 // 3. 메인 로직: 현재 날씨 정보 가져오기 (좌표 기반 호출)
@@ -288,21 +368,16 @@ async function getWeatherByCoords(lat, lon, isGeoLocation = false) {
         const response = await fetch(weatherUrl);
 
         if (!response.ok) {
-            const city = currentWeatherData ? currentWeatherData.name : '알 수 없는 위치';
             throw new Error(`날씨 정보를 찾을 수 없습니다. (API 응답 코드: ${response.status})`);
         }
 
         const data = await response.json();
 
-        // ★★★ 1. 비동기 호출을 통한 변수 정의를 최상단으로 이동 ★★★
-        // 미세먼지 정보와 예보 정보를 먼저 가져오기 시작
-        const airQualityPromise = getAirQualityByCoords(lat, lon); // Promise 생성
-        const forecastPromise = getForecastByCoords(lat, lon); // Promise 생성 (예보도 미세먼지와 함께 비동기 처리)
-
-        // 미세먼지 정보 기다림 (innerHTML 사용 전에 정의되어야 함)
-        const airQualityText = await airQualityPromise;
+        // 1. 비동기 호출 시작: 모든 API 호출을 동시에 시작 (병렬 처리)
+        const airQualityPromise = getAirQualityByCoords(lat, lon);
+        const forecastPromise = getForecastByCoords(lat, lon); 
         
-        // ★★★ 현재 시간 계산 및 주/야간 모드 판단 ★★★
+        // 2. 핵심 데이터 추출
         const currentDateTimeText = getFormattedTime(data.timezone);
         const iconCode = data.weather[0].icon;
         const isDay = iconCode.slice(-1) === 'd'; 
@@ -313,49 +388,45 @@ async function getWeatherByCoords(lat, lon, isGeoLocation = false) {
             description: data.weather[0].description,
             iconCode: iconCode
         };
-        
-        // 1. 현재 날짜/시간 표시 요소 처리
-        let dateTimeElement = document.getElementById('currentDateTime');
-        if (!dateTimeElement) {
-            dateTimeElement = document.createElement('p');
-            dateTimeElement.id = 'currentDateTime';
-            dateTimeElement.classList.add('date-time');
-            cityDisplay.parentNode.insertBefore(dateTimeElement, cityDisplay.nextSibling);
-        }
-        dateTimeElement.textContent = currentDateTimeText;
 
-        // 2. 주/야간 모드 클래스 적용 (body 배경 조정용)
-        bodyElement.className = isDay ? 'day-mode' : 'night-mode';
+        // 3. 미세먼지 정보 대기 (HTML에 사용되어야 하므로 await)
+        const airQualityText = await airQualityPromise; 
         
-        // 3. 현재 날씨 아이콘 표시
+        // 4. ★★★ DOM 조작 ★★★
+        
+        // 4a. 도시 이름 및 날짜/시간 삽입 (innerHTML로 한 번에 처리)
+        const cityHtml = isGeoLocation ? `${currentWeatherData.name} (현재 위치)` : currentWeatherData.name;
+        cityDisplay.innerHTML = `
+            ${cityHtml}
+            <p id="currentDateTime" class="date-time">${currentDateTimeText}</p> 
+        `;
+
+        // 4b. 주/야간 모드, 동적 배경, 옷차림 추천 적용
+        bodyElement.className = isDay ? 'day-mode' : 'night-mode';
+        const statusClass = getWeatherClass(currentWeatherData.description);
+        weatherApp.className = 'weather-app'; 
+        weatherApp.classList.add(statusClass);
+
+        const recommendedClothes = getClothingRecommendation(data.main.temp);
+        clothingRecommendationDisplay.textContent = `👕 ${recommendedClothes}`;
+        
+        // 4c. 날씨 아이콘 및 미세먼지 텍스트 삽입
         const weatherIconHtml = `<img src="${getIconUrl(iconCode)}" alt="${currentWeatherData.description} 아이콘" class="weather-icon">`;
         
         descriptionDisplay.innerHTML = `
             <div class="weather-status-line">
                 ${weatherIconHtml}
-                <span>${currentWeatherData.description}</span>
+                <span class="weather-description-text">${currentWeatherData.description}</span>
                 <span class="air-quality-inline">${airQualityText}</span>
             </div>
         `;
 
-        // ★★★ 옷차림 추천 로직 실행 및 표시 ★★★
-        const recommendedClothes = getClothingRecommendation(data.main.temp);
-        clothingRecommendationDisplay.textContent = `👕 ${recommendedClothes}`;
-        
-        // 4. 동적 배경 클래스 적용 (weather-app)
-        const statusClass = getWeatherClass(currentWeatherData.description);
-        weatherApp.className = 'weather-app'; 
-        weatherApp.classList.add(statusClass);
-        
-        // 5. 현재 날씨 및 온도 표시
-        cityDisplay.textContent = `${currentWeatherData.name}${isGeoLocation ? ' (현재 위치)' : ''}`;
+        // 4d. 온도 표시 업데이트
         updateTemperatureDisplay(); 
 
-        // 6. 예보 정보 가져오기 (좌표 기반)
-        getForecastByCoords(lat, lon);
-        
-        // 예보 정보 가져오기 완료 대기
+        // 5. 예보 정보 대기 및 완료
         await forecastPromise;
+
     } catch (error) {
         handleError(error);
     }
@@ -441,4 +512,18 @@ cityInput.addEventListener('keypress', (event) => {
         getWeather(city);
     }
 });
+getLocationAndWeather();
+
+// 빠른 검색 버튼 이벤트 리스너 추가
+quickCityButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const city = button.textContent.trim();
+        // 1. 입력 필드에 도시 이름 반영
+        cityInput.value = city;
+        // 2. 검색 실행
+        getWeather(city);
+    });
+});
+
+// 초기화: 앱 시작 시 현재 위치 날씨를 가져옴
 getLocationAndWeather();

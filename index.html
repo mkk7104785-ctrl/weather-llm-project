@@ -15,26 +15,43 @@
             <button id="searchBtn">검색</button>
         </div>
 
-        <div class="unit-toggle">
-            <button id="unitToggle" data-unit="C">°C / °F</button>
+        <div class="quick-search-and-toggle">
+            <div class="quick-search-buttons">
+                <button class="quick-city-btn">봉담읍</button>
+                <button class="quick-city-btn">수원</button>
+                <button class="quick-city-btn">서울</button>
+                <button class="quick-city-btn">인천</button>
+                <button class="quick-city-btn">부산</button>
+            </div>
+            
+            <div class="unit-toggle">
+                <button id="unitToggle" data-unit="C">°C / °F</button>
+            </div>
         </div>
 
         <div class="weather-info">
             <p id="cityDisplay" class="city-name"></p>
             <p id="temp" class="temperature"></p>
-
             <p id="description" class="weather-status"></p>
 
             <p id="clothingRecommendation" class="recommendation-text"></p>
-    
+
             <p id="errorMessage" class="error-message"></p>
         </div>
         
         <hr>
 
         <h2>3일 단기 예보</h2>
-        <div class="forecast-container" id="forecastContainer">
-            </div>
+        <div class="forecast-container" id="forecastContainer"></div>
+    </div>
+
+    <div id="aqiModal" class="aqi-modal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3 id="modalTitle"></h3>
+            <p id="modalValue"></p>
+            <p class="modal-unit">단위: µg/m³</p>
+        </div>
     </div>
 
     <script src="script.js"></script>
