@@ -40,12 +40,8 @@ body.night-mode {
 }
 
 .weather-status {
-    /* 아이콘을 포함할 수 있도록 margin-bottom을 조정 */
-    margin-bottom: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.3em;
+    padding: 0;
+    margin: 0;
 }
 
 /* ---------------------------------- */
@@ -60,6 +56,32 @@ body.night-mode {
     border: 1px dashed #333;
     border-radius: 5px;
     background-color: rgba(33, 33, 33, 0.05); /* 연한 배경 */
+}
+
+/* ---------------------------------- */
+/* 8. 미세먼지/대기 오염 정보 스타일 추가 */
+/* ---------------------------------- */
+.air-quality-box {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-align: left;
+    background-color: #f0f0f0; /* 배경색을 약간 회색으로 설정 */
+}
+
+.air-quality-box p {
+    margin: 5px 0;
+    font-size: 0.95em;
+    color: #555;
+}
+
+.air-quality-box .aqi-status {
+    font-weight: bold;
+    color: #007bff; 
+    margin-top: 10px;
+    border-top: 1px dashed #ccc;
+    padding-top: 5px;
 }
 
 /* ---------------------------------- */
@@ -197,6 +219,18 @@ h1 {
 .weather-info {
     margin-top: 20px;
     padding: 15px;
+    text-align: center;
+}
+
+/* 날씨 상태와 미세먼지 정보를 담을 컨테이너 스타일 추가 */
+.weather-status-line {
+    display: flex;
+    justify-content: center; /* 중앙 정렬 */
+    align-items: center;
+    font-size: 1.2em;
+    color: #666;
+    margin-bottom: 0;
+    flex-wrap: wrap; 
 }
 
 .city-name {
@@ -213,9 +247,29 @@ h1 {
 }
 
 .weather-status {
-    font-size: 1.2em;
-    color: #666;
-    margin-bottom: 0;
+    padding: 0; 
+    margin: 0;
+}
+
+/* 인라인 미세먼지 텍스트 스타일 */
+.air-quality-inline {
+    font-size: 0.8em; /* 날씨 텍스트보다 작게 */
+    color: #888; 
+    margin-left: 15px;
+    padding-left: 15px;
+    /* 인라인 요소 내부의 미세먼지 상태 텍스트 색상 */
+}
+
+.aqi-separator {
+    color: #ccc;
+    font-weight: 300;
+    margin: 0 5px;
+}
+
+.air-quality-inline .aqi-status {
+    font-weight: bold;
+    color: #3b78e7; /* 상태 강조 색상 */
+    margin-right: 5px;
 }
 
 .error-message {
@@ -229,6 +283,7 @@ hr {
     border-top: 1px dashed #ccc;
     margin: 20px 0;
 }
+
 
 /* 3일 단기 예보 스타일 (Mobile First: 세로 배열) */
 .forecast-container {

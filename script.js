@@ -25,6 +25,8 @@ const API_KEY = "6d8fe32823d8390520bec80b1d47f957";
 const DUMMY_WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather";
 const DUMMY_FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast"; 
 const DUMMY_GEOCODING_URL = "https://api.openweathermap.org/geo/1.0/direct";
+const DUMMY_AIR_POLLUTION_URL = "https://api.openweathermap.org/data/2.5/air_pollution"; 
+
 
 // ----------------------------------
 // Helper Functions (보조 함수)
@@ -101,6 +103,21 @@ function getClothingRecommendation(tempC) {
 // ----------------------------------------
 
 /**
+ * OpenWeatherMap의 AQI 지수(1-5)를 한글 상태로 변환
+ */
+function getAqiStatus(aqi) {
+    // OpenWeatherMap 기준 (1:좋음, 2:보통, 3:나쁨, 4:매우 나쁨, 5:위험)
+    switch(aqi) {
+        case 1: return "매우 좋음";
+        case 2: return "좋음";
+        case 3: return "보통";
+        case 4: return "나쁨";
+        case 5: return "매우 나쁨";
+        default: return "알 수 없음";
+    }
+}
+
+/**
  * 오류 발생 시 콘솔에 출력하고 사용자에게 표시하는 함수
  */
 function handleError(error) {
@@ -111,11 +128,16 @@ function handleError(error) {
     descriptionDisplay.textContent = '';
     forecastContainer.innerHTML = '';
     clothingRecommendationDisplay.textContent = '';
-    currentWeatherData = null;
-    weatherApp.className = 'weather-app'; // 앱 배경 초기화
-    bodyElement.className = ''; // body 배경 초기화
     
-    // 현재 시간 표시 요소 제거 (있다면)
+    // 오류 시 미세먼지 정보 초기화 
+    if (pm10StatusDisplay) pm10StatusDisplay.textContent = '';
+    if (pm25StatusDisplay) pm25StatusDisplay.textContent = '';
+    if (airQualityBox) airQualityBox.style.display = 'none';
+    
+    currentWeatherData = null;
+    weatherApp.className = 'weather-app'; 
+    bodyElement.className = ''; 
+    
     const dateTimeElement = document.getElementById('currentDateTime');
     if (dateTimeElement) dateTimeElement.remove();
 }
@@ -222,6 +244,36 @@ function displayForecast(dates, dailyForecasts) {
 }
 
 // ----------------------------------
+// 미세먼지 정보 가져오기 (문자열 반환)
+// ----------------------------------
+
+/**
+ * 좌표를 기반으로 대기 오염 정보를 가져와 간결한 문자열 상태를 반환합니다.
+ * @returns {string} 예: "미세먼지: 좋음 | 초미세먼지: 좋음"
+ */
+    async function getAirQualityByCoords(lat, lon) {
+    const url = `${DUMMY_AIR_POLLUTION_URL}?lat=${lat}&lon=${lon}&appid=${API_KEY}`;
+    
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`대기 오염 정보를 찾을 수 없습니다.`);
+        }
+        
+        const data = await response.json();
+        const general_aqi = data.list[0].main.aqi; // 전반적인 AQI 지수 (1~5)
+        const status = getAqiStatus(general_aqi);
+
+        // PM10과 PM2.5 상태만 간결하게 표시
+        return `<span class="aqi-separator">|</span> 미세먼지: <span class="aqi-status pm10">${status}</span> | 초미세먼지: <span class="aqi-status pm25">${status}</span>`;
+
+    } catch (error) {
+        console.warn("대기 오염 정보를 가져오는 중 오류 발생:", error.message);
+        return ``; // 오류 시 빈 문자열 반환
+    }
+}
+
+// ----------------------------------
 // 3. 메인 로직: 현재 날씨 정보 가져오기 (좌표 기반 호출)
 // ----------------------------------
 
@@ -236,12 +288,19 @@ async function getWeatherByCoords(lat, lon, isGeoLocation = false) {
         const response = await fetch(weatherUrl);
 
         if (!response.ok) {
-            // 이전에 city가 정의되지 않아 발생하는 오류를 수정했습니다.
             const city = currentWeatherData ? currentWeatherData.name : '알 수 없는 위치';
             throw new Error(`날씨 정보를 찾을 수 없습니다. (API 응답 코드: ${response.status})`);
         }
 
         const data = await response.json();
+
+        // ★★★ 1. 비동기 호출을 통한 변수 정의를 최상단으로 이동 ★★★
+        // 미세먼지 정보와 예보 정보를 먼저 가져오기 시작
+        const airQualityPromise = getAirQualityByCoords(lat, lon); // Promise 생성
+        const forecastPromise = getForecastByCoords(lat, lon); // Promise 생성 (예보도 미세먼지와 함께 비동기 처리)
+
+        // 미세먼지 정보 기다림 (innerHTML 사용 전에 정의되어야 함)
+        const airQualityText = await airQualityPromise;
         
         // ★★★ 현재 시간 계산 및 주/야간 모드 판단 ★★★
         const currentDateTimeText = getFormattedTime(data.timezone);
@@ -270,7 +329,14 @@ async function getWeatherByCoords(lat, lon, isGeoLocation = false) {
         
         // 3. 현재 날씨 아이콘 표시
         const weatherIconHtml = `<img src="${getIconUrl(iconCode)}" alt="${currentWeatherData.description} 아이콘" class="weather-icon">`;
-        descriptionDisplay.innerHTML = `${weatherIconHtml} ${currentWeatherData.description}`;
+        
+        descriptionDisplay.innerHTML = `
+            <div class="weather-status-line">
+                ${weatherIconHtml}
+                <span>${currentWeatherData.description}</span>
+                <span class="air-quality-inline">${airQualityText}</span>
+            </div>
+        `;
 
         // ★★★ 옷차림 추천 로직 실행 및 표시 ★★★
         const recommendedClothes = getClothingRecommendation(data.main.temp);
@@ -288,6 +354,8 @@ async function getWeatherByCoords(lat, lon, isGeoLocation = false) {
         // 6. 예보 정보 가져오기 (좌표 기반)
         getForecastByCoords(lat, lon);
         
+        // 예보 정보 가져오기 완료 대기
+        await forecastPromise;
     } catch (error) {
         handleError(error);
     }
