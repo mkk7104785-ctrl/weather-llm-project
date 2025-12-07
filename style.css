@@ -21,13 +21,13 @@ body.night-mode {
 /* 2. 도시 현재 시간 스타일 */
 .date-time {
     font-size: 0.5em;
-    color: #636363; 
+    color: #525252; 
     margin-top: 10px;
     margin-bottom: 15px;
 }
 
 .night-mode .date-time {
-    color: #969696; /* 밤 모드일 때 밝게 조정 */
+    color: #868686; /* 밤 모드일 때 밝게 조정 */
 }
 
 
@@ -211,7 +211,6 @@ h1 {
 /* style.css (.quick-search-buttons 컨테이너 스타일) */
 .quick-search-buttons {
     display: flex;
-    /* ★★★ FIX: 중앙 정렬(center) 대신 좌측 정렬(flex-start)로 변경 ★★★ */
     justify-content: flex-start; 
     
     /* 버튼 그룹 간 간격을 20px로 재설정 */
@@ -221,7 +220,6 @@ h1 {
     padding-bottom: 5px; 
     max-width: 70%;
     
-    /* ★★★ FIX: 맨 앞에 15px 여백을 명확하게 부여 ★★★ */
     padding-left: 15px; 
 }
 
@@ -241,7 +239,6 @@ h1 {
     white-space: nowrap; 
     transition: color 0.2s;
     
-    /* ★★★ FIX: 불필요한 마진/텍스트 정렬 제거 ★★★ */
     margin: 0; 
     text-align: left; /* 텍스트는 좌측 정렬이 기본 */
     
@@ -341,15 +338,44 @@ h1 {
 
 /* 마우스 오버 시 미세먼지 텍스트 색상을 약간 밝게 변경하여 피드백 제공 (선택 사항) */
 .air-quality-inline .aqi-item:hover {
-    color: #4285f4; /* 호버 시 파란색으로 변경 */
+    color: #000000; /* 호버 시 파란색으로 변경 */
 }
 
 
 /* 기존 미세먼지 상태 텍스트 (aqi-status)는 그대로 유지 */
 .air-quality-inline .aqi-status {
     font-weight: bold;
-    color: #3b78e7; /* 상태 강조 색상 (유지) */
     margin-right: 5px;
+    padding: 0 4px; /* 색상을 입힐 때 가독성을 위해 패딩 추가 */
+    border-radius: 3px;
+    background-color: transparent; /* 배경색은 일단 투명하게 유지 */
+}
+
+/* AQI 단계별 색 */
+
+/* 1. 매우 좋음 (요청: 파란색) */
+.air-quality-inline .aqi-vgood {
+    color: #4285f4; /* Google Blue (요청하신 파란색) */
+}
+
+/* 2. 좋음 (요청: 파란색과 초록색의 중간색) */
+.air-quality-inline .aqi-good {
+    color: #00A0C0; /* 청록색 계열 (파랑/초록 중간) */
+}
+
+/* 3. 보통 (요청: 초록색) */
+.air-quality-inline .aqi-moderate {
+    color: #34A853; /* Google Green (선명한 초록색) */
+}
+
+/* 4. 나쁨 (요청: 주황색) */
+.air-quality-inline .aqi-unhealthy {
+    color: #FBBC04; /* Google Yellow/Orange (주황색) */
+}
+
+/* 5. 매우 나쁨 (요청: 빨간색) */
+.air-quality-inline .aqi-very-unhealthy {
+    color: #DB4437; /* Google Red (빨간색) */
 }
 
 .error-message {

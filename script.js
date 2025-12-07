@@ -119,14 +119,14 @@ function getClothingRecommendation(tempC) {
 /**
  * OpenWeatherMap의 AQI 지수(1-5)를 한글 상태로 변환
  */
-function getAqiStatus(aqi) {
+function getAqiInfo(aqi) {
     switch(aqi) {
-        case 1: return "매우 좋음";
-        case 2: return "좋음";
-        case 3: return "보통";
-        case 4: return "나쁨";
-        case 5: return "매우 나쁨";
-        default: return "알 수 없음";
+        case 1: return { status: "매우 좋음", class: "aqi-vgood" };
+        case 2: return { status: "좋음", class: "aqi-good" };
+        case 3: return { status: "보통", class: "aqi-moderate" };
+        case 4: return { status: "나쁨", class: "aqi-unhealthy" };
+        case 5: return { status: "매우 나쁨", class: "aqi-very-unhealthy" }; 
+        default: return { status: "알 수 없음", class: "aqi-unknown" };
     }
 }
 
@@ -295,7 +295,10 @@ async function getAirQualityByCoords(lat, lon) {
         const data = await response.json();
         const components = data.list[0].components;
         const general_aqi = data.list[0].main.aqi; 
-        const status = getAqiStatus(general_aqi);
+        
+        const aqiInfo = getAqiInfo(general_aqi); 
+        const status = aqiInfo.status;
+        const statusClass = aqiInfo.class;
         
         // PM10/PM2.5 수치 가져오기 (반올림, μg/m³)
         const pm10Value = Math.round(components.pm10 || 0); 
@@ -305,17 +308,17 @@ async function getAirQualityByCoords(lat, lon) {
         const pm25Title = `초미세먼지 수치: ${pm25Value} µg/m³`;
 
         const pm10Event = `showAqiModal('미세먼지 (PM10)', ${pm10Value})`;
-        const pm25Event = `showAqiModal('초미세먼지 (PM2.5)', ${pm25Value})`;  
+        const pm25Event = `showAqiModal('초미세먼지 (PM2.5)', ${pm25Value})`;
 
         // title 속성 대신 onClick 이벤트 삽입
         return `
             <span class="aqi-separator">|</span> 
-            <span class="aqi-item" onclick="${pm10Event}">
-                미세먼지: <span class="aqi-status pm10" title="${pm10Title}">${status}</span>
+            <span class="aqi-item" onclick="${pm10Event}" title="${pm10Title}">
+                미세먼지: <span class="aqi-status ${statusClass}">${status}</span>
             </span>
             <span class="aqi-separator">|</span> 
-            <span class="aqi-item" onclick="${pm25Event}">
-                초미세먼지: <span class="aqi-status pm25" title="${pm25Title}">${status}</span>
+            <span class="aqi-item" onclick="${pm25Event}" title="${pm25Title}">
+                초미세먼지: <span class="aqi-status ${statusClass}">${status}</span>
             </span>
         `;
         // NOTE: aqi-item 클래스가 PM10 전체 항목을 감쌉니다.
